@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\3.0.0\bin\i386-win32\fpc.exe" Date="1213094983"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -l -vewnhibq &quot;-FiE:\ZIACI\Michal Sokolik\PRG\IDLE Game\lib\i386-win32&quot; &quot;-FuE:\ZIACI\Michal Sokolik\PRG\IDLE Game\&quot; &quot;-FUE:\ZIACI\Michal Sokolik\PRG\IDLE Game\lib\i386-win32\&quot; project1.lpr"/>
+</CONFIG>
