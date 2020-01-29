@@ -213,7 +213,7 @@ begin
     vypisText(100, 100, zostatok + vypisCislo(peniaze), true);
   until koniec;
 
-  //vymazat();
+  vymazat();
 
   ulozit();
 
