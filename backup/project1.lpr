@@ -15,7 +15,7 @@ type
   udaj = record
     text: string;
     cena, hodnota: integer;
-    odomknute: boolean;
+    odomknute, jeKlik, jeAuto: boolean;
   end;
 
 var
@@ -41,13 +41,15 @@ begin
   outtextxy(x, y, text);
 end;
 
-procedure inicObchod(riadok, stlpec, hodnota, cena: integer);
+procedure inicObchod(riadok, stlpec, hodnota, cena: integer; jeKlik, jeAuto: boolean);
 begin
   obchod[riadok, stlpec].text := vypisCislo(hodnota);
   obchod[riadok, stlpec].hodnota := hodnota;
   //obchod[riadok, stlpec].cena := cena;
   obchod[riadok, stlpec].cena := hodnota * 100;
-  obchod[riadok, stlpec].odomknute := false;
+  obchod[riadok, stlpec].odomknute := false;  
+  obchod[riadok, stlpec].jeKlik := jeKlik;
+  obchod[riadok, stlpec].jeAuto := jeAuto;
 end;
 
 procedure nakup(volba: sur);
@@ -67,11 +69,14 @@ begin
 end;
 
 procedure tlacitka(volba: sur);
-var i, j, x0, y0, medzera: integer;
+var i, j, x0, y0, sirka, vyska, okraj: integer;
 begin
   x0 := 10;
   y0 := 10;
-  medzera := 20;
+
+  okraj := 15;
+  sirka := 100;
+  vyska := 50;
 
   for i := 1 to riadky do
 
@@ -84,9 +89,27 @@ begin
         setcolor(yellow);
 
       if(i <> riadky) or (j <> stlpce) then
-        outtextxy(x0 + (j - 1) * medzera,
-                  y0 + (i - 1) * medzera,
-                  obchod[i, j].text);
+      begin
+        setfillstyle(1, lightgray);
+        bar(x0 + (j - 1) * (sirka + okraj), y0 + (i - 1) * (vyska + okraj),
+            x0 + (j - 1) * (sirka + okraj) + sirka, y0 + (i - 1) * (vyska + okraj) + vyska);
+
+        if(obchod[i, j].jeKlik) then
+          outtextxy(x0 + (j - 1) * (sirka + okraj) + 5,
+                    y0 + (i - 1) * (vyska + okraj) + 5, '+ ' + obchod[i, j].text)
+        else if(obchod[i, j].jeAuto) then
+          outtextxy(x0 + (j - 1) * (sirka + okraj) + 5,
+                    y0 + (i - 1) * (vyska + okraj) + 5, obchod[i, j].text + ' / sek')
+        else
+          outtextxy(x0 + (j - 1) * (sirka + okraj) + 5,
+                    y0 + (i - 1) * (vyska + okraj) + 5, obchod[i, j].text);
+
+        if(not obchod[i, j].odomknute) then setcolor(black)
+        else setcolor(lightgray);
+
+        outtextxy(x0 + (j - 1) * (sirka + okraj) + 5,
+                  y0 + (i - 1) * (vyska + okraj) + 20, vypisCislo(obchod[i, j].cena) + '$');
+      end;
     end;
 
 end;
@@ -122,14 +145,15 @@ end;
 
 procedure nastavUdaje();
 begin
-  inicObchod(1, 1, 1, 1);
-  inicObchod(2, 1, 3, 3);
-  inicObchod(3, 1, 5, 5);
-  inicObchod(4, 1, 7, 7);
-  inicObchod(1, 2, 10, 10);
-  inicObchod(2, 2, 30, 30);
-  inicObchod(3, 2, 50, 50);
-  inicObchod(4, 2, 70, 70);
+  inicObchod(1, 1, 1, 1, True, False);
+  inicObchod(2, 1, 3, 3, True, False);
+  inicObchod(3, 1, 5, 5, True, False);
+  inicObchod(4, 1, 7, 7, True, False);
+
+  inicObchod(1, 2, 10, 10, True, False);
+  inicObchod(2, 2, 30, 30, True, False);
+  inicObchod(3, 2, 50, 50, True, False);
+  inicObchod(4, 2, 70, 70, True, False);
 
   obchod[1, 1].odomknute := true;
 
@@ -172,6 +196,7 @@ begin
   assign(f_odomknutia, 'odomknutia.txt');
 
   // inicializacia
+
   volba.riadok := 1;
   volba.stlpec := 1;
   nastavUdaje();
@@ -204,16 +229,16 @@ begin
 
   end;
 
-  vypisText(100, 100, zostatok + vypisCislo(peniaze), true);
+  vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
   repeat
     tlacitka(volba);
     kurzor(volba);
     presiahnutieRozsahu(volba);
 
-    vypisText(100, 100, zostatok + vypisCislo(peniaze), true);
+    vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
   until koniec;
 
-  vymazat();
+  //vymazat();
 
   ulozit();
 
