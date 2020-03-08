@@ -75,6 +75,9 @@ begin
     peniaze := peniaze + obchod[volba.riadok, volba.stlpec].hodnota
 
   else if(obchod[volba.riadok, volba.stlpec].cena <= peniaze) then nakup(volba);
+
+  vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
+  vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true);
 end;
 
 procedure tlacitka(volba: sur);
@@ -189,9 +192,12 @@ procedure pripocitajAutoPeniaze(var _s: word);
 var h, m, s, s100: word;
 begin   
   gettime(h, m, s, s100);
-
-  vypisText(500, 500, zostatok + vypisCislo(peniaze), false);
-  if(s <> _s) then peniaze := peniaze + autoPeniaze;
+  if(s <> _s) then
+  begin
+    vypisText(500, 500, zostatok + vypisCislo(peniaze), false);
+    peniaze := peniaze + autoPeniaze;
+    vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
+  end;
 
   _s := s;
 end;
@@ -279,9 +285,6 @@ begin
     end;
 
     pripocitajAutoPeniaze(_s);
-
-    vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
-    vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true);
   until koniec;
 
   //vymazat();

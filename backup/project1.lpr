@@ -75,6 +75,9 @@ begin
     peniaze := peniaze + obchod[volba.riadok, volba.stlpec].hodnota
 
   else if(obchod[volba.riadok, volba.stlpec].cena <= peniaze) then nakup(volba);
+
+  vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
+  vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true);
 end;
 
 procedure tlacitka(volba: sur);
@@ -273,15 +276,12 @@ begin
   repeat
     if(keypressed) then
     begin
-      kurzor(volba);
-      tlacitka(volba);
+      kurzor(volba);             
       presiahnutieRozsahu(volba);
+      tlacitka(volba);
     end;
 
     pripocitajAutoPeniaze(_s);
-
-    vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
-    vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true);
   until koniec;
 
   //vymazat();
