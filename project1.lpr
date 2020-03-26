@@ -21,7 +21,7 @@ type
   end;
 
 var
-  gd, gm, i, j: smallint;
+  gd, gm, i, j, x0, y0: smallint;
   f_peniaze: file of budget; 
   f_autoPeniaze: file of autoBudget;
   f_odomknutia: file of boolean;
@@ -76,16 +76,13 @@ begin
 
   else if(obchod[volba.riadok, volba.stlpec].cena <= peniaze) then nakup(volba);
 
-  vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
-  vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true);
+  vypisText(x0, y0, zostatok + vypisCislo(peniaze), true);
+  vypisText(x0, y0 + 20, vypisCislo(autoPeniaze) + ' / sek', true);
 end;
 
-procedure tlacitka(volba: sur);
-var i, j, x0, y0, sirka, vyska, okraj: integer;
+procedure tlacitka(volba: sur; x0, y0: integer);
+var i, j, sirka, vyska, okraj: integer;
 begin
-  x0 := 10;
-  y0 := 10;
-
   okraj := 15;
   sirka := 100;
   vyska := 50;
@@ -154,8 +151,8 @@ begin
     #077: volba.stlpec := volba.stlpec + 1; // vpravo
     chr(13):                                // ENTER
     begin
-      vypisText(500, 500, zostatok + vypisCislo(peniaze), false); 
-      vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', false);
+      vypisText(x0, y0, zostatok + vypisCislo(peniaze), false);
+      vypisText(x0, y0 + 20, vypisCislo(autoPeniaze) + ' / sek', false);
       vyberMoznosti(volba);
     end;
   end;
@@ -194,9 +191,9 @@ begin
   gettime(h, m, s, s100);
   if(s <> _s) then
   begin
-    vypisText(500, 500, zostatok + vypisCislo(peniaze), false);
+    vypisText(x0, y0, zostatok + vypisCislo(peniaze), false);
     peniaze := peniaze + autoPeniaze;
-    vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
+    vypisText(x0, y0, zostatok + vypisCislo(peniaze), true);
   end;
 
   _s := s;
@@ -241,6 +238,9 @@ begin
   assign(f_autoPeniaze, 'autoPeniaze.txt');
   assign(f_odomknutia, 'odomknutia.txt');
 
+  x0 := getmaxx div 2 - (100 * stlpce div 2);
+  y0 := 50;
+
   // inicializacia
 
   volba.riadok := 1;
@@ -272,16 +272,16 @@ begin
       read(f_odomknutia, obchod[(i + 1) div stlpce, i mod stlpce].odomknute);
   end;
 
-  vypisText(500, 500, zostatok + vypisCislo(peniaze), true);
-  vypisText(500, 520, vypisCislo(autoPeniaze) + ' / sek', true); 
-  tlacitka(volba);
+  vypisText(x0, y0, zostatok + vypisCislo(peniaze), true);
+  vypisText(x0, y0 + 20, vypisCislo(autoPeniaze) + ' / sek', true);
+  tlacitka(volba, x0, y0 + 40);
 
   repeat
     if(keypressed) then
     begin
       kurzor(volba);             
       presiahnutieRozsahu(volba);
-      tlacitka(volba);
+      tlacitka(volba, x0, y0 + 40);
     end;
 
     pripocitajAutoPeniaze(_s);
