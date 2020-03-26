@@ -30,9 +30,11 @@ var
 
   volba: sur;
   obchod: array [1..riadky, 1..stlpce] of udaj;
-  koniec: boolean;
+  koniec, naspat: boolean;
   _s: word;
+  menu_volba: integer;
 
+// HRA
 function vypisCislo(cislo: integer): string;
 begin
   str(cislo, vypisCislo);
@@ -68,7 +70,7 @@ end;
 
 procedure vyberMoznosti(volba: sur);
 begin
-  if(volba.riadok = riadky) then koniec := true
+  if(volba.riadok = riadky) then naspat := true
 
   else if(obchod[volba.riadok, volba.stlpec].odomknute) and
          (obchod[volba.riadok, volba.stlpec].jeKlik) then
@@ -177,9 +179,9 @@ begin
 
   obchod[1, 1].odomknute := true;
 
-  obchod[5, 1].text := 'Koniec';
-  obchod[5, 2].text := 'Koniec'; 
-  obchod[5, 3].text := 'Koniec';
+  obchod[5, 1].text := 'Spat';
+  obchod[5, 2].text := 'Spat';
+  obchod[5, 3].text := 'Spat';
   obchod[5, 1].odomknute := true;
   obchod[5, 2].odomknute := true; 
   obchod[5, 3].odomknute := true;
@@ -199,12 +201,80 @@ begin
   _s := s;
 end;
 
+procedure hraj();
+begin
+  volba.riadok := 1;
+  volba.stlpec := 1;
+
+  // vykreslenie obchodu a zostatku
+  vypisText(x0, y0, zostatok + vypisCislo(peniaze), true);
+  vypisText(x0, y0 + 20, vypisCislo(autoPeniaze) + ' / sek', true);
+  tlacitka(volba, x0, y0 + 40);
+
+  repeat
+    if(keypressed) then
+    begin
+      kurzor(volba);
+      presiahnutieRozsahu(volba);
+      tlacitka(volba, x0, y0 + 40);
+    end;
+
+    pripocitajAutoPeniaze(_s);
+  until naspat;
+end;
+
+// MENU
+procedure menu_tlacitka(volba: integer);
+var napisy: array[1..4] of string;
+    i, sirka, vyska, okraj, x0, y0: integer;
+begin
+  sirka := 150;
+  vyska := 50;
+  okraj := 15;
+  setfillstyle(1, lightgray);
+
+  x0 := getmaxx div 2 - sirka div 2;
+  y0 := (getmaxy div 2) - (length(napisy) div 2 * (vyska + okraj));
+
+  napisy[1] := 'Hra';
+  napisy[2] := 'Ulozit';
+  napisy[3] := 'Vymazat priebeh';
+  napisy[4] := 'Koniec';
+
+  for i := 1 to length(napisy) do
+  begin
+    bar(x0, y0 + (i - 1) * (vyska + okraj), x0 + sirka, y0 + (i - 1) * (vyska + okraj) + vyska);
+
+    if(volba = i) then setcolor(yellow)
+    else setcolor(white);
+
+    outtextxy(x0 + 15, y0 + (i - 1) * (vyska + okraj) + vyska div 2, napisy[i]);
+  end;
+end;
+
+procedure menu(var volba: integer);
+var ch: char;
+begin
+  repeat
+    menu_tlacitka(volba);
+
+    ch := readkey;
+    case ch of
+      #072: volba := volba - 1; // hore
+      #080: volba := volba + 1; // dole
+    end;
+
+    if(volba < 1) then volba := 4;
+    if(volba > 4) then volba := 1;
+  until ch = chr(13);
+end;
+
 procedure ulozit();
 begin
   // peniaze
   rewrite(f_peniaze);
   write(f_peniaze, peniaze);
-  close(f_peniaze); 
+  close(f_peniaze);
 
   // autoPeniaze
   rewrite(f_autoPeniaze);
@@ -231,27 +301,31 @@ begin
   nastavUdaje();
 end;
 
+procedure vymazatObrazovku();
+begin
+  setfillstyle(1, black);
+  bar(1, 1, getmaxx, getmaxy);
+end;
+
+// PROGRAMM LOOP
 begin
   gd := detect;
   initgraph(gd, gm, ''); 
   assign(f_peniaze, 'peniaze.txt');   
   assign(f_autoPeniaze, 'autoPeniaze.txt');
-  assign(f_odomknutia, 'odomknutia.txt');
-
-  x0 := getmaxx div 2 - (100 * stlpce div 2);
-  y0 := 50;
+  assign(f_odomknutia, 'odomknutia.txt'); 
 
   // inicializacia
 
-  volba.riadok := 1;
-  volba.stlpec := 1;
-  nastavUdaje();
+  x0 := getmaxx div 2 - (100 * stlpce div 2);
+  y0 := 50; 
   koniec := false;
+  nastavUdaje();
 
   // nacitanie zostatku penazi
 
   reset(f_peniaze);
-  read(f_peniaze, peniaze); 
+  read(f_peniaze, peniaze);
 
   // nacitanie autoPenazi
 
@@ -272,24 +346,24 @@ begin
       read(f_odomknutia, obchod[(i + 1) div stlpce, i mod stlpce].odomknute);
   end;
 
-  vypisText(x0, y0, zostatok + vypisCislo(peniaze), true);
-  vypisText(x0, y0 + 20, vypisCislo(autoPeniaze) + ' / sek', true);
-  tlacitka(volba, x0, y0 + 40);
-
   repeat
-    if(keypressed) then
-    begin
-      kurzor(volba);             
-      presiahnutieRozsahu(volba);
-      tlacitka(volba, x0, y0 + 40);
+    vymazatObrazovku();
+    menu_volba := 1;
+    naspat := false;
+
+    menu(menu_volba);
+    case menu_volba of
+      1:
+      begin
+        vymazatObrazovku();
+        hraj();
+      end;
+      2: ulozit();
+      3: vymazat();
+      4: koniec := True;
     end;
 
-    pripocitajAutoPeniaze(_s);
   until koniec;
-
-  //vymazat();
-
-  ulozit();
 
   closegraph();
 end.
