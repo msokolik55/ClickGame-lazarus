@@ -307,6 +307,7 @@ begin
   bar(1, 1, getmaxx, getmaxy);
 end;
 
+// PROGRAMM LOOP
 begin
   gd := detect;
   initgraph(gd, gm, ''); 
@@ -340,10 +341,20 @@ begin
     i := i + 1;
 
     if(i mod stlpce = 0) then
-      read(f_odomknutia, obchod[(i + 1) div stlpce, stlpce].odomknute)
+      read(f_odomknutia, obchod[(i - 1) div stlpce + 1, stlpce].odomknute)
     else
-      read(f_odomknutia, obchod[(i + 1) div stlpce, i mod stlpce].odomknute);
+      read(f_odomknutia, obchod[(i - 1) div stlpce + 1, i mod stlpce].odomknute);
   end;
+
+  {
+  for i := 1 to riadky do
+  begin
+    for j := 1 to stlpce do
+      write(obchod[i, j].odomknute, ' ');
+
+    writeln();
+  end;
+  }
 
   repeat
     vymazatObrazovku();
