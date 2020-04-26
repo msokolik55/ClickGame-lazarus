@@ -224,6 +224,14 @@ begin
 end;
 
 // MENU
+procedure nadpis();
+begin
+  setfillstyle(1, white);
+  settextstyle(1, 0, 6);
+  outtextxy(x0 - 30, y0 + 70, 'Click Bajt');
+  settextstyle(1, 0, 1);
+end;
+
 procedure menu_tlacitka(volba: integer);
 var napisy: array[1..4] of string;
     i, sirka, vyska, okraj, x0, y0: integer;
@@ -307,7 +315,7 @@ begin
   bar(1, 1, getmaxx, getmaxy);
 end;
 
-// PROGRAMM LOOP
+// PROGRAM LOOP
 begin
   gd := detect;
   initgraph(gd, gm, ''); 
@@ -346,21 +354,12 @@ begin
       read(f_odomknutia, obchod[(i - 1) div stlpce + 1, i mod stlpce].odomknute);
   end;
 
-  {
-  for i := 1 to riadky do
-  begin
-    for j := 1 to stlpce do
-      write(obchod[i, j].odomknute, ' ');
-
-    writeln();
-  end;
-  }
-
   repeat
     vymazatObrazovku();
     menu_volba := 1;
     naspat := false;
 
+    nadpis();
     menu(menu_volba);
     case menu_volba of
       1:

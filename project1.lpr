@@ -224,6 +224,14 @@ begin
 end;
 
 // MENU
+procedure nadpis();
+begin
+  setfillstyle(1, white);
+  settextstyle(1, 0, 6);
+  outtextxy(x0 - 60, y0 + 80, 'Click Bajt');
+  settextstyle(1, 0, 1);
+end;
+
 procedure menu_tlacitka(volba: integer);
 var napisy: array[1..4] of string;
     i, sirka, vyska, okraj, x0, y0: integer;
@@ -307,7 +315,7 @@ begin
   bar(1, 1, getmaxx, getmaxy);
 end;
 
-// PROGRAMM LOOP
+// PROGRAM LOOP
 begin
   gd := detect;
   initgraph(gd, gm, ''); 
@@ -351,6 +359,7 @@ begin
     menu_volba := 1;
     naspat := false;
 
+    nadpis();
     menu(menu_volba);
     case menu_volba of
       1:
